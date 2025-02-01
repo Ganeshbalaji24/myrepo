@@ -16,7 +16,7 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Build Docker Image') {
+        stage('Minikube start') {
             steps {
                 script {
                     powershell """
