@@ -3,10 +3,6 @@ pipeline {
 
     environment {
         IMAGE_NAME = "myimage"
-        DOCKER_TLS_VERIFY = "1"
-        DOCKER_HOST = "tcp://127.0.0.1:4039"
-        DOCKER_CERT_PATH = "C:\\Users\\Ganesh.R\\.minikube\\certs"
-        MINIKUBE_ACTIVE_DOCKERD = "minikube"
         KUBECONFIG = "C:\\Users\\Ganesh.R\\.kube\\config"
     }
 
@@ -16,18 +12,6 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Set Docker and kubectl Context') {
-            steps {
-                script {
-                    powershell """
-                        & minikube -p minikube docker-env --shell powershell | Invoke-Expression
-                        kubectl config use-context minikube
-                    """
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -37,17 +21,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Load Image into Minikube') {
-            steps {
-                script {
-                    powershell """
-                        minikube image load ${IMAGE_NAME}:latest
-                    """
-                }
-            }
-        }
-
         stage('Deploy to Kubernetes') {
             steps {
                 script {
