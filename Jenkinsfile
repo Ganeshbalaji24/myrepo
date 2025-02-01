@@ -6,11 +6,28 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    // Check if the files exist in the workspace
+                    sh 'ls -l'  // List files in the root of the workspace
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Use bat command to build Docker image in Windows
-                    bat "docker build -t ${IMAGE_NAME}:latest ."
+                    sh "docker build -t ${IMAGE_NAME}:latest ."
+                }
+            }
+        }
+
+        stage('Set Minikube Docker Env') {
+            steps {
+                script {
+                    sh 'eval $(minikube docker-env)'
                 }
             }
         }
@@ -18,8 +35,7 @@ pipeline {
         stage('Load Image into Minikube') {
             steps {
                 script {
-                    // Load Docker image into Minikube's Docker daemon
-                    bat "minikube image load ${IMAGE_NAME}:latest"
+                    sh "minikube image load ${IMAGE_NAME}:latest"
                 }
             }
         }
@@ -27,9 +43,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Apply Kubernetes manifests
-                    bat "kubectl apply -f kubernetes/deployment.yaml"
-                    bat "kubectl apply -f kubernetes/service.yaml"
+                    // Apply the deployment and service files from the root directory
+                    sh "kubectl apply -f deployment.yaml"
+                    sh "kubectl apply -f service.yaml"
                 }
             }
         }
