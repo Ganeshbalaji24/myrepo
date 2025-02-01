@@ -2,26 +2,27 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "jenkinsimage"
-        MINIKUBE_DOCKER_ENV = "minikube -p minikube docker-env"
-        KUBEVERSION = '1.21'
+        DOCKER_TLS_VERIFY = "1"
+        DOCKER_HOST = "tcp://127.0.0.1:4039"
+        DOCKER_CERT_PATH = "C:\\Users\\Ganesh.R\\.minikube\\certs"
+        MINIKUBE_ACTIVE_DOCKERD = "minikube"
+        KUBECONFIG = "C:\\Users\\Ganesh.R\\.kube\\config"
     }
 
     stages {
-        stage('Build Docker Image') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Use bat command to build Docker image in Windows
-                    bat "docker build -t ${IMAGE_NAME}:latest ."
-                }
+                checkout scm
             }
         }
 
-        stage('Load Image into Minikube') {
+        stage('Set Docker and kubectl Context') {
             steps {
                 script {
-                    // Load Docker image into Minikube's Docker daemon
-                    bat "minikube image load ${IMAGE_NAME}:latest"
+                    powershell """
+                        & minikube -p minikube docker-env --shell powershell | Invoke-Expression
+                        kubectl config use-context minikube
+                    """
                 }
             }
         }
@@ -29,9 +30,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Apply Kubernetes manifests
-                    bat "kubectl apply -f deployment.yaml"
-                    bat "kubectl apply -f service.yaml"
+                    powershell """
+                        kubectl apply -f deployment.yaml --validate=false
+                        kubectl apply -f service.yaml --validate=false
+                    """
                 }
             }
         }
@@ -39,10 +41,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline succeeded! Application deployed to Minikube."
+            echo "Deployment completed successfully."
         }
         failure {
-            echo "Pipeline failed. Check the logs for errors."
+            echo "Pipeline failed. Check logs for errors."
         }
     }
 }
