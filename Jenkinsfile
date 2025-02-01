@@ -2,57 +2,39 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "myimage"
+        MINIKUBE_HOME = 'C:\\minikube'
+        MINIKUBE_CMD = 'minikube'
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Checkout the repository
-                checkout scm
-            }
-        }
-
-        stage('Build Docker Image') {
+        stage('Start Minikube') {
             steps {
                 script {
-                    sh "docker build -t ${IMAGE_NAME}:latest ."
+                    bat """
+                    %MINIKUBE_CMD% start --driver=docker
+                    """
                 }
             }
         }
 
-        stage('Set Minikube Docker Env') {
+        stage('List Pods') {
             steps {
                 script {
-                    sh 'eval $(minikube docker-env)'
-                }
-            }
-        }
-
-        stage('Load Image into Minikube') {
-            steps {
-                script {
-                    sh "minikube image load ${IMAGE_NAME}:latest"
-                }
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    sh "kubectl apply -f kubernetes/deployment.yaml"
-                    sh "kubectl apply -f kubernetes/service.yaml"
+                    bat """
+                    %MINIKUBE_CMD% kubectl -- get pods
+                    """
                 }
             }
         }
     }
 
     post {
-        success {
-            echo "Pipeline succeeded! Application deployed to Minikube."
-        }
-        failure {
-            echo "Pipeline failed. Check the logs for errors."
+        always {
+            script {
+                bat """
+                %MINIKUBE_CMD% stop
+                """
+            }
         }
     }
 }
