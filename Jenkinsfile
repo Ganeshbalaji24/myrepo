@@ -11,22 +11,24 @@ pipeline {
         MINIKUBE_HOME = 'C:\\minikube'
         MINIKUBE_CMD = 'minikube'
     }
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        stages {
-            stage('Start Minikube') {
-                steps {
-                    script {
-                        bat """
-                        %MINIKUBE_CMD% start --driver=docker
-                        """
-                    }
+
+        stage('Start Minikube') {
+            steps {
+                script {
+                    bat """
+                    %MINIKUBE_CMD% start --driver=docker
+                    """
                 }
             }
+        }
+
         stage('Set Docker and kubectl Context') {
             steps {
                 script {
@@ -37,6 +39,7 @@ pipeline {
                 }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -46,6 +49,7 @@ pipeline {
                 }
             }
         }
+
         stage('Load Image into Minikube') {
             steps {
                 script {
@@ -55,6 +59,7 @@ pipeline {
                 }
             }
         }
+
         stage('Deploy to Kubernetes') {
             steps {
                 script {
@@ -66,6 +71,7 @@ pipeline {
             }
         }
     }
+
     post {
         success {
             echo "Deployment completed successfully."
