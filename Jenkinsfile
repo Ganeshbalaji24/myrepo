@@ -16,7 +16,7 @@ pipeline {
                 checkout scm
             }
         }
-        
+
         stage('Set Docker and kubectl Context') {
             steps {
                 script {
