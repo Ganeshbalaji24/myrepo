@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        IMAGE_NAME = "myimage"
         DOCKER_TLS_VERIFY = "1"
         DOCKER_HOST = "tcp://127.0.0.1:4039"
         DOCKER_CERT_PATH = "C:\\Users\\Ganesh.R\\.minikube\\certs"
@@ -22,6 +23,26 @@ pipeline {
                     powershell """
                         & minikube -p minikube docker-env --shell powershell | Invoke-Expression
                         kubectl config use-context minikube
+                    """
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    powershell """
+                        docker build -t ${IMAGE_NAME}:latest .
+                    """
+                }
+            }
+        }
+
+        stage('Load Image into Minikube') {
+            steps {
+                script {
+                    powershell """
+                        minikube image load ${IMAGE_NAME}:latest
                     """
                 }
             }
