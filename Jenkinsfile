@@ -16,17 +16,7 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Minikube start') {
-            steps {
-                script {
-                    powershell """
-                        minikube start
-                    """
-                }
-            }
-        }
-
-
+        
         stage('Set Docker and kubectl Context') {
             steps {
                 script {
