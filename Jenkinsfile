@@ -11,7 +11,6 @@ pipeline {
         MINIKUBE_HOME = 'C:\\minikube'
         MINIKUBE_CMD = 'minikube'
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -28,7 +27,6 @@ pipeline {
                     }
                 }
             }
-
         stage('Set Docker and kubectl Context') {
             steps {
                 script {
@@ -39,7 +37,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -49,7 +46,6 @@ pipeline {
                 }
             }
         }
-
         stage('Load Image into Minikube') {
             steps {
                 script {
@@ -59,7 +55,6 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy to Kubernetes') {
             steps {
                 script {
@@ -71,7 +66,6 @@ pipeline {
             }
         }
     }
-
     post {
         success {
             echo "Deployment completed successfully."
