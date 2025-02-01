@@ -8,6 +8,8 @@ pipeline {
         DOCKER_CERT_PATH = "C:\\Users\\Ganesh.R\\.minikube\\certs"
         MINIKUBE_ACTIVE_DOCKERD = "minikube"
         KUBECONFIG = "C:\\Users\\Ganesh.R\\.kube\\config"
+        MINIKUBE_HOME = 'C:\\minikube'
+        MINIKUBE_CMD = 'minikube'
     }
 
     stages {
@@ -16,6 +18,16 @@ pipeline {
                 checkout scm
             }
         }
+        stages {
+            stage('Start Minikube') {
+                steps {
+                    script {
+                        bat """
+                        %MINIKUBE_CMD% start --driver=docker
+                        """
+                    }
+                }
+            }
 
         stage('Set Docker and kubectl Context') {
             steps {
