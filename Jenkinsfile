@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "jenkinsimage"
+        MINIKUBE_DOCKER_ENV = "eval $(minikube -p minikube docker-env)"
+        KUBEVERSION = '1.21'
     }
 
     stages {
