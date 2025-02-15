@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: my-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+     - name: nginx
+       image: nginx
+       resources:
+          requests:
+            memory: "128Mi"
+            cpu: "500m"
+          limits:
+            memory: "528Mi"
+            cpu: "1000m"
+       volumeMounts:
+         - mountPath: "/data/"
+           name: ganesh
+  initContainers:
+    - name: check-pvc
+      image: busybox
+      command: ["/bin/sh", "-c", "if [ -d /data ]; then echo 'PVC mounted successfully'; else echo 'PVC mount failed'; exit 1; fi"]
+      volumeMounts:
+        - mountPath: "/data/"
+          name: ganesh
+  volumes:
+    - name: ganesh
+      persistentVolumeClaim:
+        claimName: my-pvc
+
+              
